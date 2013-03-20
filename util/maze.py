@@ -10,8 +10,6 @@ try:
 except ImportError:
     from random import choice
 
-class MoveException(Exception):
-    pass
 
 class NPMaze(object):
     def __init__(self, width, height, goal=5, values=[0, 1], p=[.7, .3]):
@@ -28,6 +26,10 @@ class NPMaze(object):
         self._move_range = [-1, 0, 1]
 
     def available_moves(self, coordinates):
+        """
+        Returns a list of available coordinates given a
+        pair of current coordinates.
+        """
         moves = []
         x, y = coordinates
         for move in product(self._move_range, repeat=2):
@@ -37,34 +39,41 @@ class NPMaze(object):
             proposed_x = add_x + x
             proposed_y = add_y + y
             proposed_coordinate = (proposed_x, proposed_y)
-            if self._available_moves(proposed_coordinate):
+
+            if self._available_move(proposed_coordinate):
                 moves.append(proposed_coordinate)
+
         return moves
 
     def heuristic(self, coordinates):
         """
-        Calculate the hypotenuse from
+        Calculate the hypotenuse from current coordinates to goal.
         """
         x, y = coordinates
         goalx, goaly = self.end
         return sqrt((goalx - x)**2 + (goaly - y)**2)
 
-
-    def _available_moves(self, coordinates):
+    def _available_move(self, coordinates):
         """
-        Returns a list of coordinates that are free cells and their
-        cost.
+        Checks if this pair of coordinates is an available move
+        for this maze.
+        Returns a boolean
         """
         x, y = coordinates
+
+        # out of bounds
         if x < 0 or y < 0:
             return False
 
+        # out of bounds
         if x > self.width - 1 or y > self.height - 1:
             return False
 
+        # free space or goal
         if self.maze[y][x] in (self._free_cell, self.goal):
             return True
 
+        # obstacle
         return False
 
     @property
@@ -76,9 +85,14 @@ class NPMaze(object):
         return self._goal_coordinates
 
     def create_maze(self):
+        """
+        If numpy is available we generate the maze using a numpy.array object since it's
+        very fast to create large mazes, think 10000 x 10000 or bigger!
+        Fall back to a list comprehension.
+        """
         if np:
             self.maze = np.random.choice(self.values, (self.height, self.width), p=self.p)
-            print 'NUMPY'
+
         else:
             _free, _obstacles = self.p
             free, obstacles = int(_free * 10), int(_obstacles * 10)
@@ -90,8 +104,6 @@ class NPMaze(object):
 
         # set goal
         self.maze[self.height - 1][self.width - 1] = self.goal
-
-        print self.maze
 
     @property
     def goal_coordinates(self):

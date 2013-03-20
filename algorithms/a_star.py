@@ -53,7 +53,6 @@ def a_star_search(problem, heuristic):
                 continue
 
             child_heuristic_cost = heuristic(child_node)
-            print 'child_heuristic_cost', child_heuristic_cost
 
             # create a map from the child to the current node
             parent_map[child_node] = cur_node
