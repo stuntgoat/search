@@ -15,12 +15,13 @@ if __name__ == '__main__':
     WEIGHT_RANGE = [1, 20]
 
     # create a weighted graph
-    wg = WeightedGraph(edges=EDGES, nodes=NODES)
+    wg = WeightedGraph(edges=EDGES, nodes=NODES, weight_range=[1, 5])
     wg.expand_tree()
 
     # select a random node at the lowest depth of the graph
     random_node = choice(wg.nodes_at_level(2))
     random_node.is_goal = True
+    random_node.cost = 0
 
     wg.printer()
     print random_node, 'is the goal'

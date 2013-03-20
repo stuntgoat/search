@@ -30,7 +30,7 @@ def uniform_cost_search(problem):
         # check if this is the goal node
         if problem.goal_test(cur_node):
             return path_from_start(cur_node, parent_map)
-
+        print 'tried', cur_node.name
         # if not, acquire the list of actions for that state.
         actions = problem.actions(cur_node)  # [(2, node1), (4, node2)]
 
@@ -43,7 +43,7 @@ def uniform_cost_search(problem):
 
             # create a map from the child to the current node
             parent_map[child_node] = cur_node
-
+            print 'queueing', child_node.name
             # place each child node on the priority queue
             pq.put((cur_node_cost + transition_cost, child_node))
 
