@@ -2,8 +2,8 @@
 Generate mazes with have an interface for moving an
 finding a path.
 """
-from itertools import permutations
-
+from itertools import product
+from math import sqrt
 np = None
 try:
     import numpy as np
@@ -30,13 +30,25 @@ class NPMaze(object):
     def available_moves(self, coordinates):
         moves = []
         x, y = coordinates
-        for move in permutations(self._move_range, 2):
+        for move in product(self._move_range, repeat=2):
             add_x, add_y = move
+            if add_x == 0 and  add_y == 0:
+                continue
             proposed_x = add_x + x
             proposed_y = add_y + y
             proposed_coordinate = (proposed_x, proposed_y)
-        if self._available_moves(proposed_coordinate):
-            moves.append(proposed_coordinate)
+            if self._available_moves(proposed_coordinate):
+                moves.append(proposed_coordinate)
+        return moves
+
+    def heuristic(self, coordinates):
+        """
+        Calculate the hypotenuse from
+        """
+        x, y = coordinates
+        goalx, goaly = self.end
+        return sqrt((goalx - x)**2 + (goaly - y)**2)
+
 
     def _available_moves(self, coordinates):
         """
@@ -50,7 +62,7 @@ class NPMaze(object):
         if x > self.width - 1 or y > self.height - 1:
             return False
 
-        if self.maze[y][x] == self._free_cell:
+        if self.maze[y][x] in (self._free_cell, self.goal):
             return True
 
         return False
@@ -66,11 +78,11 @@ class NPMaze(object):
     def create_maze(self):
         if np:
             self.maze = np.random.choice(self.values, (self.height, self.width), p=self.p)
+            print 'NUMPY'
         else:
-            _obstacles, _free = self.p
-            obstacles, free = int(_obstacles * 10), int(_free * 10)
-            population = [self._obstacle_cell] * obstacles + [self._free_cell] * free
-
+            _free, _obstacles = self.p
+            free, obstacles = int(_free * 10), int(_obstacles * 10)
+            population = [self._free_cell] * free + [self._obstacle_cell] * obstacles
             self.maze = [[choice(population) for _val in range(self.width)] for _row in range(self.height)]
 
         # set start

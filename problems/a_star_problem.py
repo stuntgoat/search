@@ -1,8 +1,7 @@
+from search import Search
 
 
-
-
-class AStarProblem(object):
+class AStarProblem(Search):
     def __init__(self, maze):
         self.maze = maze
 
@@ -10,14 +9,14 @@ class AStarProblem(object):
         """
         Returns the root node or starting state.
         """
-        return self.maze.start
+        return 0, self.maze.start
 
-    def actions(self, current_cost, coordinate):
+    def actions(self, coordinates):
         """
         Return a list of available coordinates to move next and
         their costs
         """
-        return [(_n.cost, _n) for _n in node.children]
+        return [(1, x) for x in self.maze.available_moves(coordinates)]
 
     def goal_test(self, cell_coordinates):
         """
